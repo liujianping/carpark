@@ -27,4 +27,4 @@ down:
 initdb:
 	docker exec carpark-mysql ./scripts/database.sh ./sql
 	docker exec carpark-job carpark prepare -f dataset/hdb-carpark-information.csv
-	docker-compose restart carpark-job
+	docker-compose restart job

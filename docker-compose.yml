@@ -13,6 +13,8 @@ services:
       - ./etc/:/app/etc/
     links:
       - mysql
+    depends_on:
+      - mysql
   job:
     restart: always
     # build: .
@@ -24,6 +26,8 @@ services:
       - ./etc/:/app/etc/
       - ./dataset/:/app/dataset/
     links:
+      - mysql
+    depends_on:
       - mysql
   mysql:
     restart: always
