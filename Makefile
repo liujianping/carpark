@@ -15,4 +15,15 @@ gen: $(shell which db-orm)
 	db-orm code -i orm/yaml -o orm/model
 
 image: 
-	docker build --build-arg VERSION=${GITTAG} --build-arg COMMIT=${COMMIT} .
+	docker build --build-arg VERSION=${GITTAG} --build-arg COMMIT=${COMMIT} -t carpark:latest .
+
+up:
+	docker-compose up -d
+
+down:
+	docker-compose down
+
+initdb:
+	docker exec carpark-mysql ./scripts/database.sh ./sql
+	docker exec carpark-job main prepare -f dataset/hdb-carpark-information.csv
+	

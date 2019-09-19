@@ -1,0 +1,35 @@
+version: "3"
+services:
+  http:
+    restart: always
+    build: .
+    command:
+      - http
+    container_name: carpark-http
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./etc/:/app/etc/
+    links:
+      - mysql
+  job:
+    restart: always
+    build: .
+    command:
+      - job
+    container_name: carpark-job
+    volumes:
+      - ./etc/:/app/etc/
+      - ./dataset/:/app/dataset/
+    links:
+      - mysql
+  mysql:
+    restart: always
+    image: mysql:5.7
+    container_name: carpark-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    volumes:
+      - ./scripts/:/app/scripts/
+      - ./orm/sql/:/app/sql/
+    working_dir: /app

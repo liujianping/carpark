@@ -44,6 +44,10 @@ func Main(c *cmd.Command, args []string) error {
 
 	return routine.Main(
 		routine.ExecutorFunc(func(ctx context.Context) error {
+			//start
+			if err := job.Execute(ctx); err != nil {
+				return err
+			}
 			//job
 			return <-routine.Go(ctx,
 				routine.Crontab(

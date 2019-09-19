@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 RUN GOOS=linux go build -o main -ldflags "-X github.com/x-mod/build.version=${VERSION} -X github.com/x-mod/build.commit=${COMMIT}"
 
-FROM alpine3.10
+FROM alpine:3.10
 RUN  apk --update --no-cache add tzdata ca-certificates \
     && cp /usr/share/zoneinfo/Asia/Singapore /etc/localtime
 WORKDIR /app
