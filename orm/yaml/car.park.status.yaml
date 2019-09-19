@@ -1,0 +1,13 @@
+CarParkStatus:
+  dbs: [mysql]
+  dbname: db_carpark
+  dbtable: carpark_status
+  fields:
+    - CarParkNo: string
+      sqltype: VARCHAR(16)
+      flags: [primary]
+    - TotalLots: int
+    - AvailableLots: int
+      flags: [index]
+    - ReportAt: int64
+    - CreatedAt: int64

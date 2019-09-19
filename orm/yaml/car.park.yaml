@@ -1,0 +1,33 @@
+CarPark:
+  dbs: [mysql]
+  dbname: db_carpark
+  dbtable: carparks
+  fields:
+    - CarParkNo: string
+      sqltype: VARCHAR(16)
+      flags: [primary]
+    - Address: string
+      sqltype: VARCHAR(256)
+    - Latitude: float64
+      sqltype: FLOAT(10, 6)
+    - Longitude: float64
+      sqltype: FLOAT(10, 6)
+    - CarParkType: string
+      sqltype: VARCHAR(32)
+    - TypeOfParkingSystem: string
+      sqltype: VARCHAR(32)
+    - ShortTermParking: string
+      sqltype: VARCHAR(32)
+    - ShortTermParkingFrom: int64
+      comment: "short term parking start second"
+    - ShortTermParkingTo: int64
+      comment: "short term parking end second"
+    - FreeParking: string
+      sqltype: VARCHAR(32)
+    - NightParking: bool
+      sqltype: TINYINT(1)
+    - CarParkDecks: int
+    - GantryHeight: float64
+    - CarParkBasement: bool
+      sqltype: TINYINT(1)
+  indexes: [[ShortTermParkingFrom, ShortTermParkingTo]]

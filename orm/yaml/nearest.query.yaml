@@ -1,0 +1,13 @@
+NearestParkInfo:
+  dbs: [mysql, redis]
+  dbname: db_carpark
+  fields:
+    - Address: string
+      sqltype: VARCHAR(256)
+      flags: [primary]
+    - Latitude: float64
+      sqltype: FLOAT(10, 6)
+    - Longitude: float64
+      sqltype: FLOAT(10, 6)
+    - TotalLots: int
+    - AvailableLots: int
