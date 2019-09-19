@@ -13,31 +13,38 @@ import (
 	"github.com/x-mod/httpclient"
 )
 
+//ParkInfo struct
 type ParkInfo struct {
 	TotalLots     string `json:"total_lots"`
 	LotType       string `json:"lot_type"`
 	LotsAvailable string `json:"lots_available"`
 }
+
+//Park struct
 type Park struct {
 	Infos      []*ParkInfo `json:"carpark_info"`
 	ParkNo     string      `json:"carpark_number"`
 	UpdateTime string      `json:"update_datetime"`
 }
 
+//QueryItem struct
 type QueryItem struct {
 	Timestamp string  `json:"timestamp"`
 	Parks     []*Park `json:"carpark_data"`
 }
 
+//Result struct
 type Result struct {
 	Items []*QueryItem `json:"items"`
 }
 
+//JOB define
 type JOB struct {
 	*httpclient.Client
 	sg *time.Location
 }
 
+//NewJOB create a new job
 func NewJOB(c *httpclient.Client) *JOB {
 	client := httpclient.New()
 	if c != nil {
@@ -53,6 +60,7 @@ func NewJOB(c *httpclient.Client) *JOB {
 	}
 }
 
+//Execute job execute once
 func (job *JOB) Execute(ctx context.Context) error {
 	//Host timezone set Asia/Singapore
 	req, err := httpclient.MakeRequest(
@@ -70,6 +78,7 @@ func (job *JOB) Execute(ctx context.Context) error {
 	return job.Client.Execute(ctx, req, job)
 }
 
+//Process job process http.Response
 func (job *JOB) Process(ctx context.Context, rsp *http.Response) error {
 	if rsp.StatusCode != http.StatusOK {
 		return errors.New(rsp.Status)

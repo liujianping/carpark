@@ -20,6 +20,7 @@ func init() {
 	)
 }
 
+//Main for http
 func Main(c *cmd.Command, args []string) error {
 	viper.SetConfigName("config")
 	viper.AddConfigPath("etc")

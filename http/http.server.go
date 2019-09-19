@@ -14,16 +14,19 @@ import (
 	"github.com/x-mod/httpserver/render"
 )
 
+//CarParkServer define
 type CarParkServer struct {
 	*httpserver.Server
 }
 
+//NewCarParkServer create a new CarParkServer
 func NewCarParkServer(srv *httpserver.Server) *CarParkServer {
 	return &CarParkServer{
 		Server: srv,
 	}
 }
 
+//Open register route
 func (srv *CarParkServer) Open() error {
 	srv.Route(
 		httpserver.Method("GET"),
@@ -33,35 +36,35 @@ func (srv *CarParkServer) Open() error {
 	return nil
 }
 
-// /carparks/nearest?latitude=1.37326&longitude=103.897&page=1&per_page=3
+//Nearest
 func (srv *CarParkServer) Nearest(ctx context.Context, wr http.ResponseWriter, req *http.Request) {
 	slat := req.URL.Query().Get("latitude")
 	slng := req.URL.Query().Get("longitude")
 	sPage := req.URL.Query().Get("page")
 	sPerPage := req.URL.Query().Get("per_page")
 	if len(slat) == 0 {
-		render.Error(errors.New("latitude required")).Response(wr, render.StatusCode(400))
+		_ = render.Error(errors.New("latitude required")).Response(wr, render.StatusCode(400))
 		return
 	}
 	if len(slng) == 0 {
-		render.Error(errors.New("longitude required")).Response(wr, render.StatusCode(400))
+		_ = render.Error(errors.New("longitude required")).Response(wr, render.StatusCode(400))
 		return
 	}
 	lat, err := strconv.ParseFloat(slat, 64)
 	if err != nil {
-		render.Error(errors.Annotate(err, "latitude parse")).Response(wr, render.StatusCode(400))
+		_ = render.Error(errors.Annotate(err, "latitude parse")).Response(wr, render.StatusCode(400))
 		return
 	}
 	lng, err := strconv.ParseFloat(slng, 64)
 	if err != nil {
-		render.Error(errors.Annotate(err, "longitude parse")).Response(wr, render.StatusCode(400))
+		_ = render.Error(errors.Annotate(err, "longitude parse")).Response(wr, render.StatusCode(400))
 		return
 	}
 	page := 0
 	if len(sPage) != 0 {
 		num, err := strconv.ParseInt(sPage, 10, 64)
 		if err != nil {
-			render.Error(errors.Annotate(err, "page parse")).Response(wr, render.StatusCode(400))
+			_ = render.Error(errors.Annotate(err, "page parse")).Response(wr, render.StatusCode(400))
 			return
 		}
 		page = int(num)
@@ -70,7 +73,7 @@ func (srv *CarParkServer) Nearest(ctx context.Context, wr http.ResponseWriter, r
 	if len(sPerPage) != 0 {
 		num, err := strconv.ParseInt(sPerPage, 10, 64)
 		if err != nil {
-			render.Error(errors.Annotate(err, "per_page parse")).Response(wr, render.StatusCode(400))
+			_ = render.Error(errors.Annotate(err, "per_page parse")).Response(wr, render.StatusCode(400))
 			return
 		}
 		perPage = int(num)
@@ -87,9 +90,9 @@ func (srv *CarParkServer) Nearest(ctx context.Context, wr http.ResponseWriter, r
 	)
 	objs, err := model.NearestParkInfoDBMgr(model.MySQL()).QueryBySQL(stmt)
 	if err != nil {
-		render.Error(errors.Annotate(err, "query")).Response(wr, render.StatusCode(400))
+		_ = render.Error(errors.Annotate(err, "query")).Response(wr, render.StatusCode(400))
 		return
 	}
 	// log.Println("stmt:", stmt)
-	render.JSON(objs).Response(wr)
+	_ = render.JSON(objs).Response(wr)
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/x-mod/errors"
 )
 
+//CsvItem for csv item
 type CsvItem struct {
 	CarParkNo           string  `csv:"car_park_no"`
 	Address             string  `csv:"address"`
@@ -26,6 +27,7 @@ type CsvItem struct {
 	CarParkBasement     string  `csv:"car_park_basement"`
 }
 
+//Parse csv io.reader
 func Parse(rd io.Reader) ([]*CsvItem, error) {
 	items := []*CsvItem{}
 	if err := gocsv.Unmarshal(rd, &items); err != nil {

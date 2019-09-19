@@ -11,6 +11,7 @@ import (
 	"github.com/x-mod/errors"
 )
 
+//Main for prepare
 func Main(c *cmd.Command, args []string) error {
 	viper.SetConfigName("config")
 	viper.AddConfigPath("etc")
