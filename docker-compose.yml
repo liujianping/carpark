@@ -2,7 +2,8 @@ version: "3"
 services:
   http:
     restart: always
-    build: .
+    # build: .
+    image: carpark:latest
     command:
       - http
     container_name: carpark-http
@@ -14,7 +15,8 @@ services:
       - mysql
   job:
     restart: always
-    build: .
+    # build: .
+    image: carpark:latest
     command:
       - job
     container_name: carpark-job
