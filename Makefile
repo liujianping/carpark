@@ -14,6 +14,12 @@ gen: $(shell which db-orm)
 	db-orm sql -i orm/yaml -o orm/sql
 	db-orm code -i orm/yaml -o orm/model
 
+lint: $(shell which golangci-lint)
+	@golangci-lint run
+
+cover:
+	@go test ./... -coverprofile=.coverage && go tool cover -func=.coverage && unlink .coverage
+
 image: 
 	docker build --build-arg VERSION=${GITTAG} --build-arg COMMIT=${COMMIT} -t ${PROJECT}:${COMMIT} .
 	docker tag ${PROJECT}:${COMMIT} ${PROJECT}:latest

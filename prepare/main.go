@@ -2,6 +2,7 @@ package prepare
 
 import (
 	"context"
+	"log"
 	"os"
 
 	"github.com/liujianping/carpark/orm/model"
@@ -43,56 +44,66 @@ func Main(c *cmd.Command, args []string) error {
 		Database: viper.GetString("mysql.database"),
 	})
 
+	for _, item := range items {
+		if err := store(item); err != nil {
+			log.Println("ERR: csv item storing failed:", err)
+		}
+	}
+	return nil
+}
+
+func store(item *CsvItem) error {
+	obj := model.CarParkMgr.NewCarPark()
+	obj.CarParkNo = item.CarParkNo
+	obj.Address = item.Address
+	//location svy21 convert
+	lat, long := svy21.ToLatLon(item.Xcoord, item.Ycoord)
+	obj.Latitude = lat
+	obj.Longitude = long
+
+	obj.CarParkType = item.CarParkType
+	obj.TypeOfParkingSystem = item.TypeOfParkingSystem
+
+	//available parking term parse
+	obj.ShortTermParking = item.ShortTermParking
+	from, to, err := parkingPeriod(item.ShortTermParking)
+	if err != nil {
+		return err
+	}
+	obj.ShortTermParkingFrom = int64(from.Seconds())
+	obj.ShortTermParkingTo = int64(to.Seconds())
+
+	//free parking to boolean
+	obj.FreeParking = item.FreeParking
+	if item.NightParking == "YES" {
+		obj.NightParking = true
+	}
+	obj.CarParkDecks = item.CarParkDecks
+	obj.GantryHeight = item.GantryHeight
+	//basement to boolean
+	if item.CarParkBasement != "N" {
+		obj.CarParkBasement = true
+	}
+
 	tx, err := model.MySQL().BeginTx(context.TODO())
 	if err != nil {
 		return err
 	}
 	defer tx.Close()
 
-	for _, item := range items {
-		obj := model.CarParkMgr.NewCarPark()
-		obj.CarParkNo = item.CarParkNo
-		obj.Address = item.Address
-		//location svy21 convert
-		lat, long := svy21.ToLatLon(item.Xcoord, item.Ycoord)
-		obj.Latitude = lat
-		obj.Longitude = long
-
-		obj.CarParkType = item.CarParkType
-		obj.TypeOfParkingSystem = item.TypeOfParkingSystem
-
-		//available parking term parse
-		obj.ShortTermParking = item.ShortTermParking
-		from, to := parkingPeriod(item.ShortTermParking)
-		obj.ShortTermParkingFrom = int64(from.Seconds())
-		obj.ShortTermParkingTo = int64(to.Seconds())
-
-		//free parking to boolean
-		obj.FreeParking = item.FreeParking
-		if item.NightParking == "YES" {
-			obj.NightParking = true
+	pk := model.CarParkMgr.NewPrimaryKey()
+	pk.CarParkNo = item.CarParkNo
+	exist, err := model.CarParkDBMgr(tx).Exist(pk)
+	if err != nil {
+		return errors.Annotatef(err, "%s exist", obj.CarParkNo)
+	}
+	if exist {
+		if _, err := model.CarParkDBMgr(tx).Update(obj); err != nil {
+			return errors.Annotatef(err, "%s update", obj.CarParkNo)
 		}
-		obj.CarParkDecks = item.CarParkDecks
-		obj.GantryHeight = item.GantryHeight
-		//basement to boolean
-		if item.CarParkBasement != "N" {
-			obj.CarParkBasement = true
-		}
-
-		pk := model.CarParkMgr.NewPrimaryKey()
-		pk.CarParkNo = item.CarParkNo
-		exist, err := model.CarParkDBMgr(tx).Exist(pk)
-		if err != nil {
-			return errors.Annotatef(err, "%s exist", obj.CarParkNo)
-		}
-		if exist {
-			if _, err := model.CarParkDBMgr(tx).Update(obj); err != nil {
-				return errors.Annotatef(err, "%s update", obj.CarParkNo)
-			}
-		} else {
-			if _, err := model.CarParkDBMgr(tx).Create(obj); err != nil {
-				return errors.Annotatef(err, "%s create", obj.CarParkNo)
-			}
+	} else {
+		if _, err := model.CarParkDBMgr(tx).Create(obj); err != nil {
+			return errors.Annotatef(err, "%s create", obj.CarParkNo)
 		}
 	}
 	return nil
@@ -105,5 +116,7 @@ func init() {
 		cmd.Main(Main),
 	)
 	c.Flags().StringP("csv-file", "f", "", "csv file path")
-	viper.BindPFlags(c.Flags())
+	if err := viper.BindPFlags(c.Flags()); err != nil {
+		log.Println("WARN: flag binding failed ", err)
+	}
 }

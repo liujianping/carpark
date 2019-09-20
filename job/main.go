@@ -2,6 +2,7 @@ package job
 
 import (
 	"context"
+	"log"
 
 	"github.com/liujianping/carpark/orm/model"
 	"github.com/spf13/viper"
@@ -17,7 +18,9 @@ func init() {
 		cmd.Main(Main),
 	)
 	c.Flags().StringP("crontab", "c", "* * * * *", "crontab schedule")
-	viper.BindPFlags(c.Flags())
+	if err := viper.BindPFlags(c.Flags()); err != nil {
+		log.Println("WARN: flag binding failed ", err)
+	}
 }
 
 //Main for job

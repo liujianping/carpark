@@ -36,22 +36,32 @@ func Parse(rd io.Reader) ([]*CsvItem, error) {
 	return items, nil
 }
 
-func parkingPeriod(parktime string) (time.Duration, time.Duration) {
+//parktime format: 7AM-10.30PM
+func parkingPeriod(parktime string) (time.Duration, time.Duration, error) {
 	switch strings.ToUpper(parktime) {
 	case "NO":
-		return time.Duration(0), time.Duration(0)
+		return time.Duration(0), time.Duration(0), nil
 	case "WHOLE DAY":
-		return time.Duration(0), time.Second * 24 * 60 * 60
+		return time.Duration(0), time.Second * 24 * 60 * 60, nil
 	}
 	ft := strings.Split(strings.ToUpper(parktime), "-")
 	if len(ft) != 2 {
-		return time.Duration(0), time.Duration(0)
+		return time.Duration(0), time.Duration(0), errors.New("format wrong")
 	}
-	return parseDuration(ft[0]), parseDuration(ft[1])
+
+	d1, err := parseDuration(ft[0])
+	if err != nil {
+		return time.Duration(0), time.Duration(0), err
+	}
+	d2, err := parseDuration(ft[1])
+	if err != nil {
+		return time.Duration(0), time.Duration(0), err
+	}
+	return d1, d2, nil
 }
 
-//s format: 7AM-10.30PM
-func parseDuration(s string) time.Duration {
+//format: 7AM / 10.30PM
+func parseDuration(s string) (time.Duration, error) {
 	pm := false
 	if strings.HasSuffix(s, "PM") {
 		pm = true
@@ -62,28 +72,26 @@ func parseDuration(s string) time.Duration {
 	if len(ms) == 1 {
 		h, err := strconv.Atoi(ms[0])
 		if err != nil {
-			panic(err)
+			return 0, errors.Annotatef(err, "%s atoi", ms[0])
 		}
 		if pm {
-			h = h + 12
+			h += 12
 		}
-		d, _ := time.ParseDuration(fmt.Sprintf("%dh", h))
-		return d
+		return time.ParseDuration(fmt.Sprintf("%dh", h))
 	}
 	if len(ms) == 2 {
 		h, err := strconv.Atoi(ms[0])
 		if err != nil {
-			panic(err)
+			return 0, errors.Annotatef(err, "%s atoi", ms[0])
 		}
 		if pm {
-			h = h + 12
+			h += 12
 		}
 		m, err := strconv.Atoi(ms[1])
 		if err != nil {
-			panic(err)
+			return 0, errors.Annotatef(err, "%s atoi", ms[1])
 		}
-		d, _ := time.ParseDuration(fmt.Sprintf("%dh%dm", h, m))
-		return d
+		return time.ParseDuration(fmt.Sprintf("%dh%dm", h, m))
 	}
-	return time.Duration(0)
+	return time.Duration(0), errors.Errorf("%s format wrong", s)
 }

@@ -9,7 +9,8 @@ require (
 	github.com/gocarina/gocsv v0.0.0-20190821091544-020a928c6f4e
 	github.com/leodido/go-urn v1.1.0 // indirect
 	github.com/spf13/viper v1.4.0
-	github.com/x-mod/build v0.2.2 // indirect
+	github.com/stretchr/testify v1.4.0
+	github.com/x-mod/build v0.2.2
 	github.com/x-mod/cmd v0.2.2
 	github.com/x-mod/errors v0.1.6
 	github.com/x-mod/httpclient v0.3.1
