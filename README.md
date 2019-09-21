@@ -17,6 +17,9 @@ $: make initdb
 
 # check service
 $: curl -X GET http://localhost:8080/carparks/nearest?latitude=1.37326&longitude=103.897&page=0&per_page=3
+
+# stop service
+$: make down
 ````
 
 ## 2. Source from scratch
