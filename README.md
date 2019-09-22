@@ -64,7 +64,7 @@ $: make clean
 $: make gen
 ````
 
-then you can create the database `db_carpark` in your dev mysql server. please execute the `orm/sql` in database `db_carpark`.
+then you can create the database `db_carpark` in your dev mysql server(MySQL 5.7). please execute the `orm/sql` in database `db_carpark`.
 
 ### 2.3 preprocess carpark dataset from csv file
 
